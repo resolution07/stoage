@@ -1,0 +1,29 @@
+services:
+  mysql:
+    build:
+      context: ./docker/mysql
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mysql.rule=Host(`db.mukashev.xyz`)"
+      - "traefik.http.routers.mysql.entrypoints=websecure"
+      - "traefik.http.services.mysql.loadbalancer.server.port=3306"
+      - "traefik.http.routers.mysql.tls=true"
+      - "traefik.http.routers.mysql.tls.certresolver=myresolver"
+    networks:
+      - traefik
+
+volumes:
+  mysql_data:
+
+networks:
+  traefik:
+    external: true
